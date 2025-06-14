@@ -15,7 +15,7 @@ The screen will be dimmed if:
 ## Usage
 
 ```python
-from privacy_guard.controller import should_dim_screen
+from controller import should_dim_screen
 
 # Example browser data from extension
 browser_data = {

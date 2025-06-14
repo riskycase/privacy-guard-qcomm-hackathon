@@ -1,5 +1,5 @@
 import requests
-from privacy_guard.config import API_TOKEN, WORKSPACE_NAME
+from config import API_TOKEN, WORKSPACE_NAME
 
 class SensitivityChecker:
     def __init__(self, llm_url: str = "http://localhost:3001/api/v1/openai/chat/completions"):
@@ -22,7 +22,6 @@ class SensitivityChecker:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            "max_tokens": 2,
             "temperature": 0.0
         }
         try:
