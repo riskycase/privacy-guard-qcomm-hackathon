@@ -1,21 +1,24 @@
 # Privacy Guard
 
-A Python package to determine if a screen should be dimmed based on face detection and browser content sensitivity using an LLM.
+A Python package to automatically dim the screen based on face detection and browser content sensitivity using an LLM.
 
 ## Agents
 - **FaceDetectionAgent**: Pulls the number of faces from a REST API endpoint.
 - **BrowserExtensionAgent**: Accepts JSON input with `url` and `dom` fields from a browser extension.
 - **SensitivityChecker**: Uses a local LLM to determine if the content is sensitive.
+- **ScreenController**: Controls screen brightness on Windows systems.
 
 ## Logic
-The screen will be dimmed if:
+The screen will be automatically dimmed if:
 - More than 1 face is detected, **and**
 - The browser content is sensitive (as determined by the LLM)
+
+When these conditions are no longer met, the screen brightness will be restored to its original level.
 
 ## Usage
 
 ```python
-from privacy_guard.controller import should_dim_screen
+from privacy_guard.controller import should_dim_screen, dim_screen, restore_brightness
 
 # Example browser data from extension
 browser_data = {
@@ -23,9 +26,13 @@ browser_data = {
     "dom": "<html>...</html>"
 }
 
-if should_dim_screen(browser_data):
-    # Dim the screen
-    ...
+# This will automatically dim the screen if conditions are met
+# and restore brightness if conditions are not met
+should_dim = should_dim_screen(browser_data)
+
+# You can also manually control screen brightness
+dim_screen(30)  # Dim to 30% brightness
+restore_brightness()  # Restore to original brightness
 ```
 
 ## Configuration
@@ -60,3 +67,32 @@ Is the content sensitive? Answer 'yes' or 'no' only.
 - Python 3.7+
 - `requests` library
 - `python-dotenv` library
+- Windows operating system (for screen brightness control)
+
+## Testing Screen Brightness Control
+
+### PowerShell Test Script
+A PowerShell script is included to test screen brightness control functionality without running the full Privacy Guard package:
+
+```powershell
+# Run from PowerShell with administrator privileges
+.\test_screen_brightness.ps1
+```
+
+This script will:
+1. Get the current screen brightness
+2. Ask for confirmation to dim the screen to 30%
+3. If confirmed, dim the screen for 3 seconds
+4. Restore the original brightness
+
+### Example Python Script
+An example Python script is included to demonstrate how to use the Privacy Guard package:
+
+```bash
+python -m privacy_guard.example
+```
+
+This script demonstrates:
+- Checking if the screen should be dimmed based on browser data
+- Manually controlling screen brightness
+- Restoring screen brightness to its original level
