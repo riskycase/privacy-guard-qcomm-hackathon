@@ -1,5 +1,5 @@
 import requests
-from privacy_guard.config import API_TOKEN
+from privacy_guard.config import API_TOKEN, WORKSPACE_NAME
 
 class SensitivityChecker:
     def __init__(self, llm_url: str = "http://localhost:3001/api/v1/openai/chat/completions"):
@@ -17,7 +17,7 @@ class SensitivityChecker:
             "Is the content sensitive?"
         )
         payload = {
-            "model": "gpt-3b",  # adjust if needed
+            "model": WORKSPACE_NAME,  # adjust if needed
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
