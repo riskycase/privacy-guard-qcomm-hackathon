@@ -1,7 +1,7 @@
 """
 Example script demonstrating how to use the Privacy Guard package with screen brightness control.
 """
-from privacy_guard.controller import should_dim_screen, dim_screen, restore_brightness
+from controller import should_dim_screen, dim_screen, restore_brightness
 
 def main():
     """
