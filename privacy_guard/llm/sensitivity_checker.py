@@ -1,7 +1,8 @@
 import requests
+from privacy_guard.config import API_TOKEN
 
 class SensitivityChecker:
-    def __init__(self, llm_url: str = "http://localhost:3001/v1/openai/chat/completions"):
+    def __init__(self, llm_url: str = "http://localhost:3001/api/v1/openai/chat/completions"):
         self.llm_url = llm_url
 
     def is_sensitive(self, dom: str, url: str) -> bool:
@@ -25,10 +26,14 @@ class SensitivityChecker:
             "temperature": 0.0
         }
         try:
-            response = requests.post(self.llm_url, json=payload, timeout=10)
+            headers = {}
+            if API_TOKEN:
+                headers['Authorization'] = f'Bearer {API_TOKEN}'
+            
+            response = requests.post(self.llm_url, json=payload, headers=headers, timeout=10)
             response.raise_for_status()
             data = response.json()
             answer = data["choices"][0]["message"]["content"].strip().lower()
             return answer.startswith("y")
         except Exception:
-            return False 
+            return False

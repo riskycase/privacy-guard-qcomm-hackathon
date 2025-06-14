@@ -1,10 +1,7 @@
 from privacy_guard.agents.face_detection import FaceDetectionAgent
 from privacy_guard.agents.browser_extension import BrowserExtensionAgent
 from privacy_guard.llm.sensitivity_checker import SensitivityChecker
-
-# These can be moved to config.py or passed as arguments
-FACE_API_URL = "http://localhost:5000/api/faces"  # Example endpoint
-LLM_URL = "http://localhost:3001/v1/openai/chat/completions"
+from privacy_guard.config import FACE_API_URL, LLM_URL
 
 # browser_data should be provided as input to the function
 
@@ -24,4 +21,4 @@ def should_dim_screen(browser_data: dict) -> bool:
         checker = SensitivityChecker(LLM_URL)
         if checker.is_sensitive(dom, url):
             return True
-    return False 
+    return False

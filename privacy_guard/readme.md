@@ -29,7 +29,22 @@ if should_dim_screen(browser_data):
 ```
 
 ## Configuration
-Edit `privacy_guard/config.py` to set API endpoints as needed.
+The application uses environment variables for configuration. You can set these in a `.env` file in the privacy_guard directory.
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit the `.env` file to set your API endpoints and authentication token:
+   ```
+   # API Endpoints
+   FACE_API_URL=http://localhost:5000/api/faces
+   LLM_URL=http://localhost:3001/api/v1/openai/chat/completions
+   
+   # API Authentication
+   API_TOKEN=your_token_here
+   ```
 
 ## LLM Prompt
 The LLM is prompted with:
@@ -43,4 +58,5 @@ Is the content sensitive? Answer 'yes' or 'no' only.
 
 ## Requirements
 - Python 3.7+
-- `requests` library 
+- `requests` library
+- `python-dotenv` library
