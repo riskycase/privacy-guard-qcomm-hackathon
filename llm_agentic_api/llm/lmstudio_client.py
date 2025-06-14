@@ -1,6 +1,6 @@
 import os
-import onnxruntime as ort
 from transformers import AutoTokenizer
+from onnxruntime_genai import GenerativeModel
 
 # Download the ONNX model from:
 # https://huggingface.co/onnx-community/Llama-3.2-3B-Instruct-ONNX
@@ -16,7 +16,9 @@ MODEL_NAME = os.getenv(
 )
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, use_fast=False)
-session = ort.InferenceSession(ONNX_MODEL_PATH)
+
+MODEL_DIR = "./Llama-3.2-3B-Instruct-ONNX/cpu_and_mobile/cpu-int4-rtn-block-32-acc-level-4"
+model = GenerativeModel(MODEL_DIR)
 
 def chat_with_llm(messages, functions=None):
     """
@@ -25,10 +27,5 @@ def chat_with_llm(messages, functions=None):
     """
     # Concatenate messages into a single prompt
     prompt = "\n".join([m["content"] for m in messages if m["role"] in ("system", "user")])
-    inputs = tokenizer(prompt, return_tensors="np")
-    ort_inputs = {k: v for k, v in inputs.items()}
-    ort_outs = session.run(None, ort_inputs)
-    # Assume the first output is logits or token ids
-    output_ids = ort_outs[0][0]
-    response = tokenizer.decode(output_ids, skip_special_tokens=True)
-    return {"content": response} 
+    output = model.generate(prompt, max_new_tokens=128)
+    return {"content": output} 
