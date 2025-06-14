@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 import asyncio
 
-from llm.llmstudio_client import chat_with_llm
+from llm.lmstudio_client import chat_with_llm
 from agents.face_detection import get_face_count
 from agents.browser_extension import process_browser_extension_input
 
