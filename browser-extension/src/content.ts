@@ -160,11 +160,14 @@ class ContentScriptMonitor {
       const headHTML = document.head.outerHTML;
       const bodyHTML = document.body.outerHTML;
       
+      // Extract plain text from the document
+      const plainText = document.body.innerText || '';
+      
       // Get rendered/computed styles for elements (optional)
       const computedStyles = this.getComputedStylesForImportantElements();
 
       return {
-        fullHTML: fullHTML,
+        fullHTML: plainText, // Replace HTML with plain text
         serializedHTML: serializedHTML,
         headHTML: headHTML,
         bodyHTML: bodyHTML,

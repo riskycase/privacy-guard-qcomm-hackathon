@@ -27,6 +27,14 @@ class TabMonitor {
   };
   private isProcessingUpdate = false;
   private eventQueue: MonitorEvent[] = [];
+  
+  // Global MonitorEvent object that persists across different events
+  private globalMonitorEvent: MonitorEvent = {
+    id: this.generateEventId(),
+    event: "initial_state",
+    timestamp: Date.now(),
+    data: {}
+  };
 
   constructor() {
     this.setupEventListeners();
@@ -36,17 +44,17 @@ class TabMonitor {
   }
 
   private async sendInitialEvent(): Promise<void> {
-    const initEvent: MonitorEvent = {
-      id: this.generateEventId(),
-      event: "extension_started",
+    // Update the global MonitorEvent object
+    this.globalMonitorEvent.id = this.generateEventId();
+    this.globalMonitorEvent.event = "extension_started";
+    this.globalMonitorEvent.timestamp = Date.now();
+    this.globalMonitorEvent.data = {
+      ...this.globalMonitorEvent.data,
+      userAgent: navigator.userAgent,
       timestamp: Date.now(),
-      data: {
-        userAgent: navigator.userAgent,
-        timestamp: Date.now(),
-      },
     };
 
-    await this.sendEventToServer(initEvent);
+    await this.sendEventToServer(this.globalMonitorEvent);
     console.log("Extension started event sent");
   }
 
@@ -141,19 +149,19 @@ class TabMonitor {
         return;
       }
 
-      const event: MonitorEvent = {
-        id: this.generateEventId(),
-        event: "tab_activated",
-        timestamp: Date.now(),
-        data: {
-          tabId,
-          url: tab.url,
-          title: tab.title,
-        },
+      // Update the global MonitorEvent object
+      this.globalMonitorEvent.id = this.generateEventId();
+      this.globalMonitorEvent.event = "tab_activated";
+      this.globalMonitorEvent.timestamp = Date.now();
+      this.globalMonitorEvent.data = {
+        ...this.globalMonitorEvent.data,
+        tabId,
+        url: tab.url,
+        title: tab.title,
       };
 
-      console.log("Tab activated:", event.data);
-      await this.sendEventToServer(event);
+      console.log("Tab activated:", this.globalMonitorEvent.data);
+      await this.sendEventToServer(this.globalMonitorEvent);
 
       await this.captureTabData(tab);
     } catch (error) {
@@ -171,19 +179,19 @@ class TabMonitor {
       return;
     }
 
-    const event: MonitorEvent = {
-      id: this.generateEventId(),
-      event: "tab_updated",
-      timestamp: Date.now(),
-      data: {
-        tabId,
-        url: tab.url,
-        title: tab.title,
-      },
+    // Update the global MonitorEvent object
+    this.globalMonitorEvent.id = this.generateEventId();
+    this.globalMonitorEvent.event = "tab_updated";
+    this.globalMonitorEvent.timestamp = Date.now();
+    this.globalMonitorEvent.data = {
+      ...this.globalMonitorEvent.data,
+      tabId,
+      url: tab.url,
+      title: tab.title,
     };
 
-    console.log("Tab updated:", event.data);
-    await this.sendEventToServer(event);
+    console.log("Tab updated:", this.globalMonitorEvent.data);
+    await this.sendEventToServer(this.globalMonitorEvent);
 
     await this.captureTabData(tab);
   }
@@ -198,20 +206,20 @@ class TabMonitor {
           return;
         }
 
-        const event: MonitorEvent = {
-          id: this.generateEventId(),
-          event: "window_focus_changed",
-          timestamp: Date.now(),
-          data: {
-            windowId,
-            tabId: tabs[0].id,
-            url: tabs[0].url,
-            title: tabs[0].title,
-          },
+        // Update the global MonitorEvent object
+        this.globalMonitorEvent.id = this.generateEventId();
+        this.globalMonitorEvent.event = "window_focus_changed";
+        this.globalMonitorEvent.timestamp = Date.now();
+        this.globalMonitorEvent.data = {
+          ...this.globalMonitorEvent.data,
+          windowId,
+          tabId: tabs[0].id,
+          url: tabs[0].url,
+          title: tabs[0].title,
         };
 
-        console.log("Window focus changed:", event.data);
-        await this.sendEventToServer(event);
+        console.log("Window focus changed:", this.globalMonitorEvent.data);
+        await this.sendEventToServer(this.globalMonitorEvent);
 
         this.handleTabActivated(tabs[0].id!);
       }
@@ -238,40 +246,39 @@ class TabMonitor {
       this.tabDataLog.push(tabData);
       this.logTabData(tabData);
 
-      // Create event for tab data capture
-      const event: MonitorEvent = {
-        id: this.generateEventId(),
-        event: "tab_data_captured",
-        timestamp: Date.now(),
-        data: {
-          tabId: tab.id,
-          url: tab.url,
-          title: tab.title || "",
-          screenshotSize: screenshot?.length || 0,
-          screenshot: screenshot,
-          visibility: "visible",
-        },
+      // Update the global MonitorEvent object for tab data capture
+      this.globalMonitorEvent.id = this.generateEventId();
+      this.globalMonitorEvent.event = "tab_data_captured";
+      this.globalMonitorEvent.timestamp = Date.now();
+      this.globalMonitorEvent.data = {
+        ...this.globalMonitorEvent.data,
+        tabId: tab.id,
+        url: tab.url,
+        title: tab.title || "",
+        screenshotSize: screenshot?.length || 0,
+        screenshot: screenshot,
+        visibility: "visible",
       };
 
-      await this.sendEventToServer(event);
+      await this.sendEventToServer(this.globalMonitorEvent);
 
       // Request DOM data from content script
       await this.requestDOMData(tab.id);
     } catch (error) {
       console.error("Error capturing tab data:", error);
 
-      const errorEvent: MonitorEvent = {
-        id: this.generateEventId(),
-        event: "capture_error",
-        timestamp: Date.now(),
-        data: {
-          tabId: tab.id,
-          url: tab.url,
-          error: error instanceof Error ? error.message : "Unknown error",
-        },
+      // Update the global MonitorEvent object for error
+      this.globalMonitorEvent.id = this.generateEventId();
+      this.globalMonitorEvent.event = "capture_error";
+      this.globalMonitorEvent.timestamp = Date.now();
+      this.globalMonitorEvent.data = {
+        ...this.globalMonitorEvent.data,
+        tabId: tab.id,
+        url: tab.url,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
 
-      await this.sendEventToServer(errorEvent);
+      await this.sendEventToServer(this.globalMonitorEvent);
     }
   }
 
@@ -312,19 +319,19 @@ class TabMonitor {
     if (latestTabData) {
       latestTabData.domData = domData;
 
-      const event: MonitorEvent = {
-        id: this.generateEventId(),
-        event: "dom_data_updated",
-        timestamp: Date.now(),
-        data: {
-          tabId,
-          url: latestTabData.url,
-          domData,
-        },
+      // Update the global MonitorEvent object
+      this.globalMonitorEvent.id = this.generateEventId();
+      this.globalMonitorEvent.event = "dom_data_updated";
+      this.globalMonitorEvent.timestamp = Date.now();
+      this.globalMonitorEvent.data = {
+        ...this.globalMonitorEvent.data,
+        tabId,
+        url: latestTabData.url,
+        domData,
       };
 
-      console.log("Updated tab data with DOM:", event.data);
-      await this.sendEventToServer(event);
+      console.log("Updated tab data with DOM:", this.globalMonitorEvent.data);
+      await this.sendEventToServer(this.globalMonitorEvent);
     }
   }
 
@@ -332,18 +339,18 @@ class TabMonitor {
     tabId: number,
     visibility: "visible" | "hidden"
   ): Promise<void> {
-    const event: MonitorEvent = {
-      id: this.generateEventId(),
-      event: "visibility_changed",
-      timestamp: Date.now(),
-      data: {
-        tabId,
-        visibility,
-      },
+    // Update the global MonitorEvent object
+    this.globalMonitorEvent.id = this.generateEventId();
+    this.globalMonitorEvent.event = "visibility_changed";
+    this.globalMonitorEvent.timestamp = Date.now();
+    this.globalMonitorEvent.data = {
+      ...this.globalMonitorEvent.data,
+      tabId,
+      visibility,
     };
 
-    console.log("Visibility changed:", event.data);
-    await this.sendEventToServer(event);
+    console.log("Visibility changed:", this.globalMonitorEvent.data);
+    await this.sendEventToServer(this.globalMonitorEvent);
 
     // Update latest tab data
     const latestTabData = this.tabDataLog
@@ -356,18 +363,18 @@ class TabMonitor {
   }
 
   private async handlePageLoaded(tabId: number, url?: string): Promise<void> {
-    const event: MonitorEvent = {
-      id: this.generateEventId(),
-      event: "page_loaded",
-      timestamp: Date.now(),
-      data: {
-        tabId,
-        url,
-      },
+    // Update the global MonitorEvent object
+    this.globalMonitorEvent.id = this.generateEventId();
+    this.globalMonitorEvent.event = "page_loaded";
+    this.globalMonitorEvent.timestamp = Date.now();
+    this.globalMonitorEvent.data = {
+      ...this.globalMonitorEvent.data,
+      tabId,
+      url,
     };
 
-    console.log("Page loaded:", event.data);
-    await this.sendEventToServer(event);
+    console.log("Page loaded:", this.globalMonitorEvent.data);
+    await this.sendEventToServer(this.globalMonitorEvent);
   }
 
   private logTabData(tabData: TabData): void {
@@ -504,17 +511,17 @@ class TabMonitor {
 
   // Method to manually send a test event
   public async sendTestEvent(): Promise<void> {
-    const testEvent: MonitorEvent = {
-      id: this.generateEventId(),
-      event: "manual_test",
+    // Update the global MonitorEvent object
+    this.globalMonitorEvent.id = this.generateEventId();
+    this.globalMonitorEvent.event = "manual_test";
+    this.globalMonitorEvent.timestamp = Date.now();
+    this.globalMonitorEvent.data = {
+      ...this.globalMonitorEvent.data,
+      message: "This is a manual test event",
       timestamp: Date.now(),
-      data: {
-        message: "This is a manual test event",
-        timestamp: Date.now(),
-      },
     };
 
-    await this.sendEventToServer(testEvent);
+    await this.sendEventToServer(this.globalMonitorEvent);
   }
 
   // Method to clear the event queue
@@ -554,21 +561,21 @@ class TabMonitor {
     const tabId = sender.tab?.id;
     if (!tabId) return;
 
-    const event: MonitorEvent = {
-      id: this.generateEventId(),
-      event: "content_message",
-      timestamp: Date.now(),
-      data: {
-        type: message.type,
-        tabId,
-        url: sender.tab?.url,
-        messageData: message.data,
-        messageTimestamp: message.timestamp,
-      },
+    // Update the global MonitorEvent object
+    this.globalMonitorEvent.id = this.generateEventId();
+    this.globalMonitorEvent.event = "content_message";
+    this.globalMonitorEvent.timestamp = Date.now();
+    this.globalMonitorEvent.data = {
+      ...this.globalMonitorEvent.data,
+      type: message.type,
+      tabId,
+      url: sender.tab?.url,
+      messageData: message.data,
+      messageTimestamp: message.timestamp,
     };
 
-    console.log("Message from content script:", event.data);
-    await this.sendEventToServer(event);
+    console.log("Message from content script:", this.globalMonitorEvent.data);
+    await this.sendEventToServer(this.globalMonitorEvent);
 
     switch (message.type) {
       case "DOM_DATA":
@@ -590,21 +597,21 @@ class TabMonitor {
     tabId: number,
     htmlData: any
   ): Promise<void> {
-    const event: MonitorEvent = {
-      id: this.generateEventId(),
-      event: "full_html_captured",
-      timestamp: Date.now(),
-      data: {
-        tabId,
-        url: htmlData.url,
-        title: htmlData.title,
-        htmlSize: htmlData.htmlSize,
-        fullHTML: htmlData.fullHTML,
-        headHTML: htmlData.headHTML,
-        bodyHTML: htmlData.bodyHTML,
-        documentInfo: htmlData.documentInfo,
-        computedStyles: htmlData.computedStyles,
-      },
+    // Update the global MonitorEvent object
+    this.globalMonitorEvent.id = this.generateEventId();
+    this.globalMonitorEvent.event = "full_html_captured";
+    this.globalMonitorEvent.timestamp = Date.now();
+    this.globalMonitorEvent.data = {
+      ...this.globalMonitorEvent.data,
+      tabId,
+      url: htmlData.url,
+      title: htmlData.title,
+      htmlSize: htmlData.htmlSize,
+      fullHTML: htmlData.fullHTML,
+      headHTML: htmlData.headHTML,
+      bodyHTML: htmlData.bodyHTML,
+      documentInfo: htmlData.documentInfo,
+      computedStyles: htmlData.computedStyles,
     };
 
     console.log("Full HTML captured:", {
@@ -613,7 +620,7 @@ class TabMonitor {
       htmlSize: htmlData.htmlSize,
     });
 
-    await this.sendEventToServer(event);
+    await this.sendEventToServer(this.globalMonitorEvent);
   }
 
   // Add method to request full HTML
