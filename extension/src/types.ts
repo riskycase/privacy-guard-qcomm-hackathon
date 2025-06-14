@@ -5,7 +5,7 @@ export interface TabData {
   timestamp: number;
   screenshot?: string;
   domData?: DOMData;
-  visibility: 'visible' | 'hidden';
+  visibility: "visible" | "hidden";
 }
 
 export interface DOMData {
@@ -20,7 +20,7 @@ export interface DOMData {
 }
 
 export interface MessageData {
-  type: 'DOM_DATA' | 'VISIBILITY_CHANGE' | 'PAGE_LOADED';
+  type: "DOM_DATA" | "VISIBILITY_CHANGE" | "PAGE_LOADED" | "FULL_HTML";
   data: any;
   tabId: number;
   timestamp: number;

@@ -1,0 +1,333 @@
+{
+	"info": {
+		"_postman_id": "ebb709fc-f95a-45aa-8f13-03b6cf3b8791",
+		"name": "Tab Monitor API",
+		"description": "API collection for Tab Monitor Central Server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41640516"
+	},
+	"item": [
+		{
+			"name": "Health & Info",
+			"item": [
+				{
+					"name": "Get API Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}",
+							"host": [
+								"{{baseUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Storage Operations",
+			"item": [
+				{
+					"name": "Store String Data",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": \"Hello World from Postman!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/test-string",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"test-string"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Store Object Data",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"id\": \"evt_123456789_abc\",\n    \"event\": \"tab_activated\",\n    \"timestamp\": 1693123456789,\n    \"data\": {\n      \"tabId\": 123,\n      \"url\": \"https://example.com\",\n      \"title\": \"Example Site\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/latest_tab_event",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"latest_tab_event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Object Data",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"id\": \"evt_123456789_abc\",\n    \"event\": \"tab_activated\",\n    \"timestamp\": 1693123456789,\n    \"data\": {\n      \"tabId\": 123,\n      \"url\": \"https://example.com\",\n      \"title\": \"Example Site\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/latest_tab_event",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"latest_tab_event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Data by Key",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/latest_tab_event",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"latest_tab_event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Key Exists",
+					"request": {
+						"method": "HEAD",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/latest_tab_event",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"latest_tab_event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Specific Key",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/test-string",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"test-string"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Storage Management",
+			"item": [
+				{
+					"name": "Get Storage Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear All Data",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/storage",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Extension Event Examples",
+			"item": [
+				{
+					"name": "Simulate Tab Activation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"id\": \"evt_{{$timestamp}}_sim\",\n    \"event\": \"tab_activated\",\n    \"timestamp\": {{$timestamp}}000,\n    \"data\": {\n      \"tabId\": {{$randomInt}},\n      \"url\": \"https://{{$randomWord}}.com\",\n      \"title\": \"{{$randomWords}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/latest_tab_event",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"latest_tab_event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Simulate Visibility Change",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"id\": \"evt_{{$timestamp}}_vis\",\n    \"event\": \"visibility_changed\",\n    \"timestamp\": {{$timestamp}}000,\n    \"data\": {\n      \"tabId\": {{$randomInt}},\n      \"visibility\": \"{{$randomArrayElement(['visible', 'hidden']}}\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/latest_tab_event",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"latest_tab_event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Simulate DOM Data Update",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"id\": \"evt_{{$timestamp}}_dom\",\n    \"event\": \"dom_data_updated\",\n    \"timestamp\": {{$timestamp}}000,\n    \"data\": {\n      \"tabId\": {{$randomInt}},\n      \"url\": \"https://{{$randomWord}}.com\",\n      \"domData\": {\n        \"title\": \"{{$randomWords}}\",\n        \"url\": \"https://{{$randomWord}}.com\",\n        \"domain\": \"{{$randomWord}}.com\",\n        \"elementCount\": {{$randomInt}},\n        \"imageCount\": {{$randomInt}},\n        \"linkCount\": {{$randomInt}},\n        \"textContent\": \"{{$randomLoremSentences}}\",\n        \"metaTags\": {\n          \"description\": \"{{$randomLoremSentence}}\",\n          \"keywords\": \"{{$randomWords}}\"\n        }\n      }\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/storage/latest_tab_event",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"storage",
+								"latest_tab_event"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

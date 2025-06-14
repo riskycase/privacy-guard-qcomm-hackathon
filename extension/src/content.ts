@@ -1,5 +1,12 @@
 import { MessageData, DOMData } from './types';
 
+interface ExtendedDOMData extends DOMData {
+  fullHTML: string;
+  htmlSize: number;
+  bodyHTML: string;
+  headHTML: string;
+}
+
 class ContentScriptMonitor {
   private tabId: number;
 
@@ -26,14 +33,64 @@ class ContentScriptMonitor {
       this.sendDOMData();
     });
 
+    // Custom event listener for HTML requests
+    window.addEventListener('REQUEST_FULL_HTML', () => {
+      this.sendFullHTML();
+    });
+
     // Initial DOM data send after page load
     if (document.readyState === 'complete') {
-      setTimeout(() => this.sendDOMData(), 1000);
+      setTimeout(() => {
+        this.sendDOMData();
+        this.sendFullHTML();
+      }, 1000);
     } else {
       window.addEventListener('load', () => {
-        setTimeout(() => this.sendDOMData(), 1000);
+        setTimeout(() => {
+          this.sendDOMData();
+          this.sendFullHTML();
+        }, 1000);
       });
     }
+
+    // Monitor for dynamic changes (optional)
+    this.setupDOMObserver();
+  }
+
+  private setupDOMObserver(): void {
+    // Observer for significant DOM changes
+    const observer = new MutationObserver((mutations) => {
+      let significantChange = false;
+      
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          // Check if significant nodes were added
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as Element;
+              if (element.tagName && ['DIV', 'SECTION', 'ARTICLE', 'MAIN'].includes(element.tagName)) {
+                significantChange = true;
+              }
+            }
+          });
+        }
+      });
+
+      if (significantChange) {
+        // Debounce the updates
+        clearTimeout((this as any).domUpdateTimeout);
+        (this as any).domUpdateTimeout = setTimeout(() => {
+          this.sendDOMData();
+        }, 2000);
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: false,
+      characterData: false
+    });
   }
 
   private handleVisibilityChange(): void {
@@ -74,7 +131,97 @@ class ContentScriptMonitor {
     });
   }
 
-  private extractDOMData(): DOMData {
+  private sendFullHTML(): void {
+    const htmlData = this.extractFullHTML();
+    
+    console.log('Sending full HTML data:', {
+      htmlSize: htmlData.htmlSize,
+      url: window.location.href
+    });
+    
+    this.sendMessage({
+      type: 'FULL_HTML',
+      data: htmlData,
+      tabId: this.tabId,
+      timestamp: Date.now()
+    });
+  }
+
+  private extractFullHTML(): any {
+    try {
+      // Method 1: Get complete document HTML
+      const fullHTML = document.documentElement.outerHTML;
+      
+      // Method 2: Using XMLSerializer (alternative approach)
+      const serializer = new XMLSerializer();
+      const serializedHTML = serializer.serializeToString(document);
+      
+      // Method 3: Get specific parts
+      const headHTML = document.head.outerHTML;
+      const bodyHTML = document.body.outerHTML;
+      
+      // Get rendered/computed styles for elements (optional)
+      const computedStyles = this.getComputedStylesForImportantElements();
+
+      return {
+        fullHTML: fullHTML,
+        serializedHTML: serializedHTML,
+        headHTML: headHTML,
+        bodyHTML: bodyHTML,
+        htmlSize: fullHTML.length,
+        url: window.location.href,
+        title: document.title,
+        timestamp: Date.now(),
+        computedStyles: computedStyles,
+        documentInfo: {
+          readyState: document.readyState,
+          characterSet: document.characterSet,
+          contentType: document.contentType,
+          lastModified: document.lastModified,
+          domain: document.domain
+        }
+      };
+    } catch (error) {
+      console.error('Error extracting full HTML:', error);
+      return {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        url: window.location.href,
+        timestamp: Date.now()
+      };
+    }
+  }
+
+  private getComputedStylesForImportantElements(): any {
+    const importantElements: { [key: string]: any } = {};
+    
+    try {
+      // Get styles for specific elements
+      const selectors = ['body', 'main', '.container', '#main', 'article', 'section'];
+      
+      selectors.forEach(selector => {
+        const element = document.querySelector(selector);
+        if (element) {
+          const computedStyle = window.getComputedStyle(element);
+          importantElements[selector] = {
+            backgroundColor: computedStyle.backgroundColor,
+            color: computedStyle.color,
+            fontSize: computedStyle.fontSize,
+            fontFamily: computedStyle.fontFamily,
+            width: computedStyle.width,
+            height: computedStyle.height,
+            display: computedStyle.display,
+            position: computedStyle.position
+          };
+        }
+      });
+    } catch (error) {
+      console.error('Error getting computed styles:', error);
+    }
+    
+    return importantElements;
+  }
+
+  private extractDOMData(): ExtendedDOMData {
     const metaTags: Record<string, string> = {};
     
     // Extract meta tags
@@ -88,6 +235,11 @@ class ContentScriptMonitor {
 
     // Get text content (truncated for performance)
     const textContent = document.body?.innerText?.substring(0, 5000) || '';
+    
+    // Get full HTML
+    const fullHTML = document.documentElement.outerHTML;
+    const bodyHTML = document.body?.outerHTML || '';
+    const headHTML = document.head?.outerHTML || '';
 
     return {
       title: document.title,
@@ -97,7 +249,11 @@ class ContentScriptMonitor {
       imageCount: document.querySelectorAll('img').length,
       linkCount: document.querySelectorAll('a').length,
       textContent,
-      metaTags
+      metaTags,
+      fullHTML,
+      htmlSize: fullHTML.length,
+      bodyHTML,
+      headHTML
     };
   }
 
