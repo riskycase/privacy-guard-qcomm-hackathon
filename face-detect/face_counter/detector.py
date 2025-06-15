@@ -126,7 +126,7 @@ class FaceDetector:
             heatmap = outputs[0][0, 0]  # Remove batch and channel dimensions
             
             # Find peaks in heatmap
-            peaks = self._find_peaks(heatmap, threshold=0.5)
+            peaks = self._find_peaks(heatmap, threshold=0.7)
             
             # Convert peaks to bounding boxes
             valid_boxes = []

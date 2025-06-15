@@ -61,7 +61,7 @@ class ContentScriptMonitor {
     // Observer for significant DOM changes
     const observer = new MutationObserver((mutations) => {
       let significantChange = false;
-      
+
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
           // Check if significant nodes were added
@@ -95,15 +95,20 @@ class ContentScriptMonitor {
 
   private handleVisibilityChange(): void {
     const visibility = document.hidden ? 'hidden' : 'visible';
-    
+
     console.log('Visibility changed:', visibility);
-    
-    this.sendMessage({
-      type: 'VISIBILITY_CHANGE',
-      data: { visibility },
-      tabId: this.tabId,
-      timestamp: Date.now()
-    });
+
+    if (visibility === "visible")
+      this.sendMessage({
+        type: 'VISIBILITY_CHANGE',
+        data: {
+          visibility,
+          url: window.location.href,
+          title: document.title
+        },
+        tabId: this.tabId,
+        timestamp: Date.now()
+      });
   }
 
   private sendPageLoadedMessage(): void {
@@ -120,9 +125,9 @@ class ContentScriptMonitor {
 
   private sendDOMData(): void {
     const domData = this.extractDOMData();
-    
+
     console.log('Sending DOM data:', domData);
-    
+
     this.sendMessage({
       type: 'DOM_DATA',
       data: domData,
@@ -133,12 +138,12 @@ class ContentScriptMonitor {
 
   private sendFullHTML(): void {
     const htmlData = this.extractFullHTML();
-    
+
     console.log('Sending full HTML data:', {
       htmlSize: htmlData.htmlSize,
       url: window.location.href
     });
-    
+
     this.sendMessage({
       type: 'FULL_HTML',
       data: htmlData,
@@ -151,18 +156,18 @@ class ContentScriptMonitor {
     try {
       // Method 1: Get complete document HTML
       const fullHTML = document.documentElement.outerHTML;
-      
+
       // Method 2: Using XMLSerializer (alternative approach)
       const serializer = new XMLSerializer();
       const serializedHTML = serializer.serializeToString(document);
-      
+
       // Method 3: Get specific parts
       const headHTML = document.head.outerHTML;
       const bodyHTML = document.body.outerHTML;
-      
+
       // Extract plain text from the document
       const plainText = document.body.innerText || '';
-      
+
       // Get rendered/computed styles for elements (optional)
       const computedStyles = this.getComputedStylesForImportantElements();
 
@@ -196,11 +201,11 @@ class ContentScriptMonitor {
 
   private getComputedStylesForImportantElements(): any {
     const importantElements: { [key: string]: any } = {};
-    
+
     try {
       // Get styles for specific elements
       const selectors = ['body', 'main', '.container', '#main', 'article', 'section'];
-      
+
       selectors.forEach(selector => {
         const element = document.querySelector(selector);
         if (element) {
@@ -220,13 +225,13 @@ class ContentScriptMonitor {
     } catch (error) {
       console.error('Error getting computed styles:', error);
     }
-    
+
     return importantElements;
   }
 
   private extractDOMData(): ExtendedDOMData {
     const metaTags: Record<string, string> = {};
-    
+
     // Extract meta tags
     document.querySelectorAll('meta').forEach(meta => {
       const name = meta.getAttribute('name') || meta.getAttribute('property');
@@ -238,7 +243,7 @@ class ContentScriptMonitor {
 
     // Get text content (truncated for performance)
     const textContent = document.body?.innerText?.substring(0, 5000) || '';
-    
+
     // Get full HTML
     const fullHTML = document.documentElement.outerHTML;
     const bodyHTML = document.body?.outerHTML || '';

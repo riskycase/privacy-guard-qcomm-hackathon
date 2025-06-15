@@ -27,7 +27,7 @@ class TabMonitor {
   };
   private isProcessingUpdate = false;
   private eventQueue: MonitorEvent[] = [];
-  
+
   // Global MonitorEvent object that persists across different events
   private globalMonitorEvent: MonitorEvent = {
     id: this.generateEventId(),
@@ -232,14 +232,14 @@ class TabMonitor {
     if (!tab.id || !tab.url || this.shouldIgnoreUrl(tab.url)) return;
 
     try {
-      const screenshot = await this.captureScreenshot(tab.id);
+      // const screenshot = await this.captureScreenshot(tab.id);
 
       const tabData: TabData = {
         url: tab.url,
         title: tab.title || "",
         tabId: tab.id,
         timestamp: Date.now(),
-        screenshot,
+        // screenshot,
         visibility: "visible",
       };
 
@@ -255,8 +255,8 @@ class TabMonitor {
         tabId: tab.id,
         url: tab.url,
         title: tab.title || "",
-        screenshotSize: screenshot?.length || 0,
-        screenshot: screenshot,
+        // screenshotSize: screenshot?.length || 0,
+        // screenshot: screenshot,
         visibility: "visible",
       };
 
@@ -537,13 +537,13 @@ class TabMonitor {
       queueLength: this.eventQueue.length,
       isProcessing: this.isProcessingUpdate,
       queuedEventTypes: this.eventQueue.map(event => event.event),
-      oldestEvent: this.eventQueue.length > 0 ? 
+      oldestEvent: this.eventQueue.length > 0 ?
         {
           id: this.eventQueue[0].id,
           event: this.eventQueue[0].event,
           timestamp: this.eventQueue[0].timestamp
         } : null,
-      newestEvent: this.eventQueue.length > 0 ? 
+      newestEvent: this.eventQueue.length > 0 ?
         {
           id: this.eventQueue[this.eventQueue.length - 1].id,
           event: this.eventQueue[this.eventQueue.length - 1].event,

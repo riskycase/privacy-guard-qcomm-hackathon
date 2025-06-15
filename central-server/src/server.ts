@@ -19,26 +19,26 @@ class Server {
   private setupMiddleware(): void {
     // Security middleware
     this.app.use(helmet());
-    
+
     // CORS
     this.app.use(cors({
       origin: process.env.CORS_ORIGIN || '*',
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization']
     }));
-    
+
     // Compression
     this.app.use(compression());
-    
+
     // Body parsing
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-    
+
     // Request logging
-    this.app.use((req: Request, res: Response, next) => {
-      console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-      next();
-    });
+    // this.app.use((req: Request, res: Response, next) => {
+    //   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    //   next();
+    // });
   }
 
   private setupRoutes(): void {

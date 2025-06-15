@@ -27,7 +27,7 @@ class StorageService {
 
   public get(key: string): StorageResponse {
     const item = this.storage.get(key);
-    
+
     if (!item) {
       return {
         success: false,
@@ -56,11 +56,11 @@ class StorageService {
 
   public delete(key: string): StorageResponse {
     const existed = this.storage.delete(key);
-    
+
     return {
       success: true,
-      message: existed 
-        ? `Data deleted successfully for key: ${key}` 
+      message: existed
+        ? `Data deleted successfully for key: ${key}`
         : `No data found for key: ${key}`
     };
   }
@@ -80,7 +80,7 @@ class StorageService {
   public clear(): StorageResponse {
     const keyCount = this.storage.size;
     this.storage.clear();
-    
+
     return {
       success: true,
       message: `Cleared ${keyCount} keys from storage`
@@ -96,11 +96,11 @@ const storageService = new StorageService();
 const router = Router();
 
 // Middleware for request logging
-router.use((req: Request, res: Response, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`, 
-    req.method === 'POST' ? { body: req.body } : { query: req.query });
-  next();
-});
+// router.use((req: Request, res: Response, next) => {
+//   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`, 
+//     req.method === 'POST' ? { body: req.body } : { query: req.query });
+//   next();
+// });
 
 // POST /api/storage/:key - Store data
 router.post('/:key', (req: Request, res: Response) => {
@@ -128,7 +128,7 @@ router.post('/:key', (req: Request, res: Response) => {
 
     // Convert data to string if it's not already
     const stringData = typeof data === 'string' ? data : JSON.stringify(data);
-    
+
     const result = storageService.set(key, stringData);
     res.status(201).json(result);
   } catch (error) {
@@ -156,7 +156,7 @@ router.get('/:key', (req: Request, res: Response) => {
     }
 
     const result = storageService.get(key);
-    
+
     if (!result.success) {
       return res.status(404).json(result);
     }

@@ -136,21 +136,10 @@ class BrowserDataClient:
                 # Handle different event types
                 event_type = event_data.get("event", "")
                 event_payload = event_data.get("data", {})
-                
-                if event_type in ["tab_activated", "tab_updated", "tab_data_captured"]:
-                    browser_data["url"] = event_payload.get("url", "")
-                    browser_data["title"] = event_payload.get("title", "")
-                    browser_data["screenshot"] = event_payload.get("screenshot", "")
-                
-                elif event_type == "full_html_captured":
-                    browser_data["url"] = event_payload.get("url", "")
-                    browser_data["title"] = event_payload.get("title", "")
-                    browser_data["dom"] = event_payload.get("bodyHTML", "")
-                
-                elif event_type == "dom_data_updated":
-                    browser_data["url"] = event_payload.get("url", "")
-                    dom_data = event_payload.get("domData", {})
-                    browser_data["dom"] = dom_data.get("bodyText", "")
+
+                browser_data["url"] = event_payload.get("url", "")
+                browser_data["title"] = event_payload.get("title", "")
+                browser_data["dom"] = event_payload.get("messageData", "").get("textContent", "")
                 
                 return browser_data
             
@@ -173,13 +162,14 @@ class SensitivityChecker:
         system_prompt = (
             "You are a helpful assistant that determines if web content is sensitive. "
             "If the content contains personal, financial, confidential, or private information, answer 'yes'. "
+            "If the URL is a known sensitive site (e.g., social media, banking), also answer 'yes'. "
             "Otherwise, answer 'no'. Respond with only 'yes' or 'no'."
         )
         
         user_prompt = (
             f"URL: {url}\n"
-            f"Content: {content[:2000]}\n"  # Truncate to 2000 chars
-            "Is the content sensitive?"
+            # f"Content: {content[:8000]}\n"  # Truncate to 2000 chars
+            # "Is the content sensitive?"
         )
         
         payload = {
@@ -188,8 +178,9 @@ class SensitivityChecker:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            "temperature": 0.0
+            "temperature": 0.7
         }
+        print(self.workspace_name)
         
         try:
             headers = {"Content-Type": "application/json"}
@@ -216,7 +207,7 @@ class UnifiedPrivacyGuard:
                  face_api_url: str = "http://127.0.0.1:8000/face-count",
                  browser_server_url: str = "http://localhost:3000/api/storage",
                  llm_url: str = "http://localhost:3001/api/v1/openai/chat/completions",
-                 check_interval: float = 2.0):
+                 check_interval: float = 0.5):
         
         self.face_client = FaceDetectionClient(face_api_url)
         self.browser_client = BrowserDataClient(browser_server_url)
@@ -351,7 +342,7 @@ def main():
     parser.add_argument(
         "--check-interval",
         type=float,
-        default=2.0,
+        default=0.5,
         help="Check interval in seconds"
     )
     parser.add_argument(
