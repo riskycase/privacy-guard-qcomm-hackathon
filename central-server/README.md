@@ -10,7 +10,6 @@ A simple Express.js server that provides key-value storage functionality for the
 - Compression for reduced bandwidth usage
 - Security headers with Helmet
 - Health check endpoint
-- Request logging
 
 ## API Endpoints
 

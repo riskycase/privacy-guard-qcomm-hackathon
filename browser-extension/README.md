@@ -5,10 +5,6 @@ A Chrome extension that monitors tab changes, captures page data, and sends even
 ## Features
 
 - Monitors tab activation, updates, and visibility changes
-- Captures screenshots of active tabs
-- Extracts DOM data from web pages
-- Captures full HTML content
-- Queues events when server is busy to ensure all data is sent
 - Configurable server connection settings
 - Retry mechanism for failed server communications
 
@@ -54,8 +50,6 @@ Click on the extension icon in your browser toolbar to:
 - View current monitoring status
 - Configure server settings
 - Test server connection
-- View event queue status
-- Clear event queue if needed
 
 ### Server Configuration
 
@@ -66,7 +60,7 @@ By default, the extension connects to a local server at `http://localhost:3000/a
 ### Project Structure
 
 - `src/background.ts`: Background service worker that handles tab monitoring and server communication
-- `src/content.ts`: Content script that extracts DOM data from web pages
+- `src/content.ts`: Content script that extracts URL
 - `src/popup.html` & `src/popup.ts`: Extension popup UI
 - `src/types.ts`: TypeScript type definitions
 
@@ -75,14 +69,6 @@ By default, the extension connects to a local server at `http://localhost:3000/a
 - `npm run dev`: Build in development mode with watch mode enabled
 - `npm run build`: Build for production
 - `npm run clean`: Remove build artifacts
-
-### Event Queue System
-
-The extension implements an event queue system to ensure all events are sent to the server, even when the server is busy or temporarily unavailable. Events are:
-
-1. Queued when the server is busy processing another event
-2. Processed in order once the server becomes available
-3. Retried multiple times if sending fails
 
 ## Building for Production
 

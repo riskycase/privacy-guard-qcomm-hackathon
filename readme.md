@@ -22,19 +22,12 @@ This project consists of two main components:
         | Monitors                                    | Stores
         ↓                                             ↓
    Browser Activity                              In-memory Storage
-   - Tab changes                                 - Events
-   - Screenshots                                 - Screenshots
-   - DOM data                                    - DOM data
-   - HTML content                                - HTML content
+   - Tab changes                                 - Latest URL
 ```
 
 ## Features
 
 - Real-time tab activity monitoring
-- Screenshot capture
-- DOM data extraction
-- Full HTML capture
-- Event queuing system for reliable data transmission
 - RESTful API for data storage and retrieval
 - In-memory key-value storage
 
@@ -44,7 +37,7 @@ This project consists of two main components:
 
 - Node.js (v14 or higher)
 - npm (v6 or higher)
-- Chrome browser (for extension)
+- Chromium based browser (for extension)
 
 ### Installation
 
@@ -90,7 +83,7 @@ This project consists of two main components:
 
 Each component has its own development workflow. Please refer to the README.md files in the respective directories for detailed development instructions:
 
-- [Tab Monitor Extension](./extension/README.md)
+- [Tab Monitor Extension](./browser-extension/README.md)
 - [Central Server](./central-server/README.md)
 
 ## License
