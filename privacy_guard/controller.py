@@ -22,9 +22,8 @@ def should_dim_screen(browser_data: dict) -> bool:
     Returns True if the screen should be dimmed (more than 1 face and sensitive content), else False.
     Also dims the screen if conditions are met.
     """
-    # face_agent = FaceDetectionAgent(FACE_API_URL)
-    # face_count = face_agent.get_face_count()
-    face_count=2
+    face_agent = FaceDetectionAgent(FACE_API_URL)
+    face_count = face_agent.get_face_count()
 
     browser_agent = BrowserExtensionAgent(browser_data)
     data = browser_agent.get_browser_data()
