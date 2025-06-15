@@ -177,7 +177,7 @@ Content is considered sensitive if it contains:
 ### Test Individual Components
 
 ```bash
-# Test face detection API
+# Test face detection API 
 curl http://127.0.0.1:8000/face-count
 
 # Test browser data storage
