@@ -45,7 +45,19 @@ This runs on `http://localhost:3000` by default.
 2. Ensure it's configured to send data to `http://localhost:3000/api/storage`
 
 ### 4. LLM Service
-Ensure your LLM service is running on the configured endpoint (default: `http://localhost:3001/api/v1/openai/chat/completions`)
+The system supports multiple LLM service providers:
+
+**AnythingLLM**: Enterprise-grade document chatting with multi-user support
+- Install AnythingLLM following their installation guide
+- Create a workspace for Privacy Guard
+- Configure API access and obtain your API token
+
+**Developer/Local LLM**: For development and testing
+- Use Ollama for local LLM deployment
+- Use LocalAI for OpenAI-compatible local API
+- Use development tiers of cloud providers
+
+Ensure your chosen LLM service is running on the configured endpoint (default: `http://localhost:3001/api/v1/openai/chat/completions`)
 
 ## Environment Configuration
 
