@@ -1,0 +1,7 @@
+setuptools>=69.0.0  # Latest version with Python 3.13 support
+pytest>=8.0.0  # Latest version with Python 3.13 support
+numpy>=1.26.0  # Latest version with Python 3.13 support
+opencv-python>=4.9.0.80  # Latest version with Python 3.13 support
+pytest-cov>=4.1.0  # Latest version with Python 3.13 support
+wheel>=0.42.0  # Latest version with Python 3.13 support
+onnxruntime>=1.17.0  # Required for module import, will be mocked in tests 
